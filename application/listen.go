@@ -9,24 +9,27 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+const (
+	BasePath = "/api/v1"
+)
+
 var (
 	router = gin.Default()
 )
 
 func Listen() {
-	docs.SwaggerInfo.BasePath = "/api/v1"
-
-	v1 := router.Group("/api/v1")
+	docs.SwaggerInfo.BasePath = BasePath
+	v1 := router.Group(BasePath)
 	{
 		accounts := v1.Group("/accounts")
 		{
 			accounts.GET("", controllers.GetAccounts)
+			accounts.POST("", middlewares.AccountBody, controllers.AddAccount)
 			accounts.GET(":accountId", middlewares.AccountId, controllers.GetAccount)
+			accounts.DELETE(":accountId", middlewares.AccountId, controllers.RemoveAccount)
+			accounts.PATCH(":accountId", middlewares.AccountId, middlewares.AccountBody, controllers.UpdateAccount)
 		}
 	}
-	router.POST("/accounts/", middlewares.AccountBody, controllers.AddAccount)
-	router.DELETE("/accounts/:accountId", middlewares.AccountId, controllers.RemoveAccount)
-	router.PATCH("/accounts/:accountId", middlewares.AccountId, middlewares.AccountBody, controllers.UpdateAccount)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	router.Run()
 }
