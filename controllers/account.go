@@ -30,30 +30,6 @@ func GetAccounts(context *gin.Context) {
 }
 
 // @BasePath /api/v1
-// @Summary get account by id
-// @Schemes
-// @Description get account by id
-// @Tags accounts
-// @Accept json
-// @Produce json
-// @Param accountId path string true "Account ID"
-// @Success 200 {object} entities.Account
-// @Failure 400 {object} payloads.BadRequest
-// @Failure 404 {object} payloads.NotFound
-// @Router /accounts/{accountId} [get]
-func GetAccount(context *gin.Context) {
-	accountId := context.MustGet("accountId").(uuid.UUID)
-	account := services.GetAccount(accountId)
-
-	if account.Id == uuid.Nil {
-		context.AbortWithStatusJSON(http.StatusNotFound, payloads.NotFound{Message: "Account not found"})
-		return
-	}
-
-	context.JSON(http.StatusOK, payloads.Ok{Data: account})
-}
-
-// @BasePath /api/v1
 // @Summary add account
 // @Schemes
 // @Description add account
@@ -79,9 +55,9 @@ func AddAccount(context *gin.Context) {
 }
 
 // @BasePath /api/v1
-// @Summary update account
+// @Summary get account by id
 // @Schemes
-// @Description update account
+// @Description get account by id
 // @Tags accounts
 // @Accept json
 // @Produce json
@@ -89,21 +65,13 @@ func AddAccount(context *gin.Context) {
 // @Success 200 {object} entities.Account
 // @Failure 400 {object} payloads.BadRequest
 // @Failure 404 {object} payloads.NotFound
-// @Router /accounts/{accountId} [patch]
-func UpdateAccount(context *gin.Context) {
+// @Router /accounts/{accountId} [get]
+func GetAccount(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
-	input := context.MustGet("accountInput").(inputs.Account)
 	account := services.GetAccount(accountId)
 
 	if account.Id == uuid.Nil {
 		context.AbortWithStatusJSON(http.StatusNotFound, payloads.NotFound{Message: "Account not found"})
-		return
-	}
-
-	copier.Copy(&account, &input)
-
-	if err := services.UpdateAccount(accountId, account); err != nil {
-		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
 	}
 
@@ -137,4 +105,36 @@ func RemoveAccount(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusNoContent, payloads.NoContent{Message: "Account removed"})
+}
+
+// @BasePath /api/v1
+// @Summary update account
+// @Schemes
+// @Description update account
+// @Tags accounts
+// @Accept json
+// @Produce json
+// @Param accountId path string true "Account ID"
+// @Success 200 {object} entities.Account
+// @Failure 400 {object} payloads.BadRequest
+// @Failure 404 {object} payloads.NotFound
+// @Router /accounts/{accountId} [patch]
+func UpdateAccount(context *gin.Context) {
+	accountId := context.MustGet("accountId").(uuid.UUID)
+	input := context.MustGet("accountInput").(inputs.Account)
+	account := services.GetAccount(accountId)
+
+	if account.Id == uuid.Nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, payloads.NotFound{Message: "Account not found"})
+		return
+	}
+
+	copier.Copy(&account, &input)
+
+	if err := services.UpdateAccount(accountId, account); err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, payloads.Ok{Data: account})
 }
