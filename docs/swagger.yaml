@@ -1,0 +1,179 @@
+basePath: /api/v1
+definitions:
+  entities.Account:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email_address:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      is_external_contractor:
+        type: boolean
+      note:
+        type: string
+      personal_url:
+        type: string
+      phone_number:
+        type: string
+      relationship_status:
+        type: integer
+      updated_at:
+        type: string
+      years_of_age:
+        type: integer
+    type: object
+  payloads.BadRequest:
+    properties:
+      message:
+        type: string
+    type: object
+  payloads.NotFound:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /accounts:
+    get:
+      consumes:
+      - application/json
+      description: get all accounts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Account'
+            type: array
+      summary: get all accounts
+      tags:
+      - accounts
+    post:
+      consumes:
+      - application/json
+      description: add account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Account'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/payloads.BadRequest'
+      summary: add account
+      tags:
+      - accounts
+  /accounts/{accountId}:
+    delete:
+      consumes:
+      - application/json
+      description: remove account
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Account'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/payloads.BadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payloads.NotFound'
+      summary: remove account
+      tags:
+      - accounts
+    get:
+      consumes:
+      - application/json
+      description: get account by id
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Account'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/payloads.BadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payloads.NotFound'
+      summary: get account by id
+      tags:
+      - accounts
+    patch:
+      consumes:
+      - application/json
+      description: update account
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Account'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/payloads.BadRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payloads.NotFound'
+      summary: update account
+      tags:
+      - accounts
+schemes:
+- http
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

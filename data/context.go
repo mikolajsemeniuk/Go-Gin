@@ -16,7 +16,3 @@ func init() {
 		panic("failed to connect database")
 	}
 }
-
-func Seed() {
-
-}
