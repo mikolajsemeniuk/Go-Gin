@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -24,9 +22,10 @@ import (
 // @Success 200 {array} entities.Account
 // @Router /accounts [get]
 func GetAccounts(context *gin.Context) {
-	accounts := services.GetAccounts()
+	channel := make(chan []entities.Account)
+	go services.GetAccounts(channel)
 
-	context.JSON(http.StatusOK, payloads.Ok{Data: accounts})
+	context.JSON(http.StatusOK, payloads.Ok{Data: <-channel})
 }
 
 // @BasePath /api/v1
@@ -42,16 +41,19 @@ func GetAccounts(context *gin.Context) {
 func AddAccount(context *gin.Context) {
 	account := entities.Account{}
 	input := context.MustGet("accountInput").(inputs.Account)
+	channel := make(chan error)
 
 	copier.Copy(&account, &input)
 
-	if err := services.AddAccount(&account); err != nil {
+	go services.AddAccount(&account, channel)
+	if err := <-channel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
 	}
 
-	location := url.URL{Path: fmt.Sprintf("/accounts/%s", account.Id)}
-	context.Redirect(http.StatusFound, location.RequestURI())
+	// location := url.URL{Path: fmt.Sprintf("/accounts/%s", account.Id)}
+	// context.Redirect(http.StatusFound, location.RequestURI())
+	context.JSON(http.StatusOK, payloads.Ok{Data: account})
 }
 
 // @BasePath /api/v1
@@ -68,7 +70,10 @@ func AddAccount(context *gin.Context) {
 // @Router /accounts/{accountId} [get]
 func GetAccount(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
-	account := services.GetAccount(accountId)
+	channel := make(chan entities.Account)
+
+	go services.GetAccount(accountId, channel)
+	account := <-channel
 
 	if account.Id == uuid.Nil {
 		context.AbortWithStatusJSON(http.StatusNotFound, payloads.NotFound{Message: "Account not found"})
@@ -92,14 +97,19 @@ func GetAccount(context *gin.Context) {
 // @Router /accounts/{accountId} [delete]
 func RemoveAccount(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
-	account := services.GetAccount(accountId)
+	accountChannel := make(chan entities.Account)
+	errorChannel := make(chan error)
+
+	go services.GetAccount(accountId, accountChannel)
+	account := <-accountChannel
 
 	if account.Id == uuid.Nil {
 		context.AbortWithStatusJSON(http.StatusNotFound, payloads.NotFound{Message: "Account not found"})
 		return
 	}
 
-	if err := services.RemoveAccount(account); err != nil {
+	go services.RemoveAccount(&account, errorChannel)
+	if err := <-errorChannel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
 	}
@@ -122,7 +132,11 @@ func RemoveAccount(context *gin.Context) {
 func UpdateAccount(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
 	input := context.MustGet("accountInput").(inputs.Account)
-	account := services.GetAccount(accountId)
+	accountChannel := make(chan entities.Account)
+	errorChannel := make(chan error)
+
+	go services.GetAccount(accountId, accountChannel)
+	account := <-accountChannel
 
 	if account.Id == uuid.Nil {
 		context.AbortWithStatusJSON(http.StatusNotFound, payloads.NotFound{Message: "Account not found"})
@@ -131,7 +145,8 @@ func UpdateAccount(context *gin.Context) {
 
 	copier.Copy(&account, &input)
 
-	if err := services.UpdateAccount(accountId, account); err != nil {
+	go services.UpdateAccount(accountId, &account, errorChannel)
+	if err := <-errorChannel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
 	}

@@ -8,38 +8,38 @@ import (
 	"github.com/mikolajsemeniuk/Supreme-Go/entities"
 )
 
-func GetAccounts() []entities.Account {
+func GetAccounts(channel chan []entities.Account) {
 	accounts := []entities.Account{}
 	data.Context.Find(&accounts)
-	return accounts
+	channel <- accounts
 }
 
-func GetAccount(accountId uuid.UUID) *entities.Account {
+func GetAccount(accountId uuid.UUID, channel chan entities.Account) {
 	account := entities.Account{}
 	data.Context.Take(&account, accountId)
-	return &account
+	channel <- account
 }
 
-func AddAccount(account *entities.Account) error {
+func AddAccount(account *entities.Account, channel chan error) {
 	result := data.Context.Create(&account)
 	if result.RowsAffected == 0 {
-		return errors.New("error has occured")
+		channel <- errors.New("error has occured")
 	}
-	return nil
+	channel <- nil
 }
 
-func RemoveAccount(account *entities.Account) error {
+func RemoveAccount(account *entities.Account, channel chan error) {
 	result := data.Context.Delete(&account)
 	if result.RowsAffected == 0 {
-		return errors.New("error has occured")
+		channel <- errors.New("error has occured")
 	}
-	return nil
+	channel <- nil
 }
 
-func UpdateAccount(accountId uuid.UUID, account *entities.Account) error {
+func UpdateAccount(accountId uuid.UUID, account *entities.Account, channel chan error) {
 	result := data.Context.Save(&account)
 	if result.RowsAffected == 0 {
-		return errors.New("error has occured")
+		channel <- errors.New("error has occured")
 	}
-	return nil
+	channel <- nil
 }
