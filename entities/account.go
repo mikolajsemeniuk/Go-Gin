@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"github.com/google/uuid"
 	e "github.com/mikolajsemeniuk/Supreme-Go/enums"
 )
 
@@ -15,10 +14,4 @@ type Account struct {
 	IsExternalContractor bool                 `json:"is_external_contractor"`
 	RelationshipStatus   e.RelationshipStatus `json:"relationship_status"`
 	Note                 string               `json:"note"`
-}
-
-type AccountRepository interface {
-	GetAccounts() []Account
-	GetAccount(accountId uuid.UUID) *Account
-	AddAccount(account *Account) error
 }

@@ -8,19 +8,33 @@ import (
 	"github.com/mikolajsemeniuk/Supreme-Go/entities"
 )
 
-func GetAccounts(channel chan []entities.Account) {
+var (
+	Account IAccountService = &AccountService{}
+)
+
+type AccountService struct{}
+
+type IAccountService interface {
+	GetAccounts(channel chan []entities.Account)
+	GetAccount(accountId uuid.UUID, channel chan entities.Account)
+	AddAccount(account *entities.Account, channel chan error)
+	RemoveAccount(account *entities.Account, channel chan error)
+	UpdateAccount(accountId uuid.UUID, account *entities.Account, channel chan error)
+}
+
+func (*AccountService) GetAccounts(channel chan []entities.Account) {
 	accounts := []entities.Account{}
 	data.Context.Find(&accounts)
 	channel <- accounts
 }
 
-func GetAccount(accountId uuid.UUID, channel chan entities.Account) {
+func (*AccountService) GetAccount(accountId uuid.UUID, channel chan entities.Account) {
 	account := entities.Account{}
 	data.Context.Take(&account, accountId)
 	channel <- account
 }
 
-func AddAccount(account *entities.Account, channel chan error) {
+func (*AccountService) AddAccount(account *entities.Account, channel chan error) {
 	result := data.Context.Create(&account)
 	if result.RowsAffected == 0 {
 		channel <- errors.New("error has occured")
@@ -28,7 +42,7 @@ func AddAccount(account *entities.Account, channel chan error) {
 	channel <- nil
 }
 
-func RemoveAccount(account *entities.Account, channel chan error) {
+func (*AccountService) RemoveAccount(account *entities.Account, channel chan error) {
 	result := data.Context.Delete(&account)
 	if result.RowsAffected == 0 {
 		channel <- errors.New("error has occured")
@@ -36,7 +50,7 @@ func RemoveAccount(account *entities.Account, channel chan error) {
 	channel <- nil
 }
 
-func UpdateAccount(accountId uuid.UUID, account *entities.Account, channel chan error) {
+func (*AccountService) UpdateAccount(accountId uuid.UUID, account *entities.Account, channel chan error) {
 	result := data.Context.Save(&account)
 	if result.RowsAffected == 0 {
 		channel <- errors.New("error has occured")

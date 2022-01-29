@@ -23,7 +23,7 @@ import (
 // @Router /accounts [get]
 func GetAccounts(context *gin.Context) {
 	channel := make(chan []entities.Account)
-	go services.GetAccounts(channel)
+	go services.Account.GetAccounts(channel)
 
 	context.JSON(http.StatusOK, payloads.Ok{Data: <-channel})
 }
@@ -45,7 +45,7 @@ func AddAccount(context *gin.Context) {
 
 	copier.Copy(&account, &input)
 
-	go services.AddAccount(&account, channel)
+	go services.Account.AddAccount(&account, channel)
 	if err := <-channel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
@@ -72,7 +72,7 @@ func GetAccount(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
 	channel := make(chan entities.Account)
 
-	go services.GetAccount(accountId, channel)
+	go services.Account.GetAccount(accountId, channel)
 	account := <-channel
 
 	if account.Id == uuid.Nil {
@@ -100,7 +100,7 @@ func RemoveAccount(context *gin.Context) {
 	accountChannel := make(chan entities.Account)
 	errorChannel := make(chan error)
 
-	go services.GetAccount(accountId, accountChannel)
+	go services.Account.GetAccount(accountId, accountChannel)
 	account := <-accountChannel
 
 	if account.Id == uuid.Nil {
@@ -108,7 +108,7 @@ func RemoveAccount(context *gin.Context) {
 		return
 	}
 
-	go services.RemoveAccount(&account, errorChannel)
+	go services.Account.RemoveAccount(&account, errorChannel)
 	if err := <-errorChannel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
@@ -135,7 +135,7 @@ func UpdateAccount(context *gin.Context) {
 	accountChannel := make(chan entities.Account)
 	errorChannel := make(chan error)
 
-	go services.GetAccount(accountId, accountChannel)
+	go services.Account.GetAccount(accountId, accountChannel)
 	account := <-accountChannel
 
 	if account.Id == uuid.Nil {
@@ -145,7 +145,7 @@ func UpdateAccount(context *gin.Context) {
 
 	copier.Copy(&account, &input)
 
-	go services.UpdateAccount(accountId, &account, errorChannel)
+	go services.Account.UpdateAccount(accountId, &account, errorChannel)
 	if err := <-errorChannel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
