@@ -43,6 +43,9 @@ require (
 	github.com/swaggo/swag v1.7.8 // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect
 	github.com/urfave/cli/v2 v2.3.0 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
+	go.uber.org/zap v1.20.0 // indirect
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
 	golang.org/x/net v0.0.0-20220121210141-e204ce36a2ba // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect

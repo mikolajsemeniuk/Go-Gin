@@ -4,6 +4,7 @@ import (
 	"github.com/mikolajsemeniuk/Supreme-Go/application"
 	"github.com/mikolajsemeniuk/Supreme-Go/data"
 	"github.com/mikolajsemeniuk/Supreme-Go/entities"
+	"github.com/mikolajsemeniuk/Supreme-Go/logger"
 )
 
 // @title           Swagger Example API
@@ -25,5 +26,6 @@ import (
 // @securityDefinitions.basic  BasicAuth
 func main() {
 	data.Context.AutoMigrate(&entities.Account{})
+	logger.Info("Start the application")
 	application.Listen()
 }
