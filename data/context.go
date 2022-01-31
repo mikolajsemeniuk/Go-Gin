@@ -10,8 +10,12 @@ var (
 )
 
 func init() {
+	config := &gorm.Config{
+		SkipDefaultTransaction: true,
+		PrepareStmt:            true,
+	}
 	var err error
-	Context, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	Context, err = gorm.Open(sqlite.Open("test.db"), config)
 	if err != nil {
 		panic("failed to connect database")
 	}
