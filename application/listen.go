@@ -23,11 +23,11 @@ func Listen() {
 	{
 		accounts := v1.Group("/accounts")
 		{
-			accounts.GET("", controllers.GetAccounts)
-			accounts.POST("", middlewares.AccountBody, controllers.AddAccount)
-			accounts.GET(":accountId", middlewares.AccountId, controllers.GetAccount)
-			accounts.DELETE(":accountId", middlewares.AccountId, controllers.RemoveAccount)
-			accounts.PATCH(":accountId", middlewares.AccountId, middlewares.AccountBody, controllers.UpdateAccount)
+			accounts.GET("", controllers.Account.All)
+			accounts.POST("", middlewares.AccountBody, controllers.Account.Add)
+			accounts.GET(":accountId", middlewares.AccountId, controllers.Account.SingleById)
+			accounts.DELETE(":accountId", middlewares.AccountId, controllers.Account.Remove)
+			accounts.PATCH(":accountId", middlewares.AccountId, middlewares.AccountBody, controllers.Account.Update)
 		}
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

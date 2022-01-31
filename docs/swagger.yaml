@@ -27,6 +27,42 @@ definitions:
       years_of_age:
         type: integer
     type: object
+  inputs.Account:
+    properties:
+      email_address:
+        type: string
+      full_name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      is_external_contractor:
+        type: boolean
+      note:
+        maxLength: 500
+        minLength: 5
+        type: string
+      personal_url:
+        type: string
+      phone_number:
+        type: string
+      relationship_status:
+        maximum: 3
+        minimum: 0
+        type: integer
+      years_of_age:
+        maximum: 40
+        minimum: 18
+        type: integer
+    required:
+    - email_address
+    - full_name
+    - is_external_contractor
+    - note
+    - personal_url
+    - phone_number
+    - relationship_status
+    - years_of_age
+    type: object
   payloads.BadRequest:
     properties:
       message:
@@ -72,6 +108,13 @@ paths:
       consumes:
       - application/json
       description: add account
+      parameters:
+      - description: account to create
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/inputs.Account'
       produces:
       - application/json
       responses:
@@ -153,6 +196,12 @@ paths:
         name: accountId
         required: true
         type: string
+      - description: account to update
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/inputs.Account'
       produces:
       - application/json
       responses:

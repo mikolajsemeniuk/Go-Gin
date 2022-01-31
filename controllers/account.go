@@ -12,7 +12,20 @@ import (
 	"github.com/mikolajsemeniuk/Supreme-Go/services"
 )
 
-// @BasePath /api/v1
+var (
+	Account IAccount = &account{}
+)
+
+type account struct{}
+
+type IAccount interface {
+	All(context *gin.Context)
+	Add(context *gin.Context)
+	SingleById(context *gin.Context)
+	Remove(context *gin.Context)
+	Update(context *gin.Context)
+}
+
 // @Summary get all accounts
 // @Schemes
 // @Description get all accounts
@@ -21,31 +34,31 @@ import (
 // @Produce json
 // @Success 200 {array} entities.Account
 // @Router /accounts [get]
-func GetAccounts(context *gin.Context) {
+func (account) All(context *gin.Context) {
 	channel := make(chan []entities.Account)
-	go services.Account.GetAccounts(channel)
+	go services.Account.All(channel)
 
 	context.JSON(http.StatusOK, payloads.Ok{Data: <-channel})
 }
 
-// @BasePath /api/v1
 // @Summary add account
 // @Schemes
 // @Description add account
 // @Tags accounts
 // @Accept json
 // @Produce json
-// @Success 200 {object} entities.Account
+// @Param account body inputs.Account true "account to create"
+// @Success 201 {object} entities.Account
 // @Failure 400 {object} payloads.BadRequest
 // @Router /accounts [post]
-func AddAccount(context *gin.Context) {
+func (account) Add(context *gin.Context) {
 	account := entities.Account{}
 	input := context.MustGet("accountInput").(inputs.Account)
 	channel := make(chan error)
 
 	copier.Copy(&account, &input)
 
-	go services.Account.AddAccount(&account, channel)
+	go services.Account.Add(&account, channel)
 	if err := <-channel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
@@ -53,10 +66,9 @@ func AddAccount(context *gin.Context) {
 
 	// location := url.URL{Path: fmt.Sprintf("/accounts/%s", account.Id)}
 	// context.Redirect(http.StatusFound, location.RequestURI())
-	context.JSON(http.StatusOK, payloads.Ok{Data: account})
+	context.JSON(http.StatusCreated, payloads.Ok{Data: account})
 }
 
-// @BasePath /api/v1
 // @Summary get account by id
 // @Schemes
 // @Description get account by id
@@ -68,11 +80,11 @@ func AddAccount(context *gin.Context) {
 // @Failure 400 {object} payloads.BadRequest
 // @Failure 404 {object} payloads.NotFound
 // @Router /accounts/{accountId} [get]
-func GetAccount(context *gin.Context) {
+func (account) SingleById(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
 	channel := make(chan entities.Account)
 
-	go services.Account.GetAccount(accountId, channel)
+	go services.Account.SingleById(accountId, channel)
 	account := <-channel
 
 	if account.Id == uuid.Nil {
@@ -83,7 +95,6 @@ func GetAccount(context *gin.Context) {
 	context.JSON(http.StatusOK, payloads.Ok{Data: account})
 }
 
-// @BasePath /api/v1
 // @Summary remove account
 // @Schemes
 // @Description remove account
@@ -95,12 +106,12 @@ func GetAccount(context *gin.Context) {
 // @Failure 400 {object} payloads.BadRequest
 // @Failure 404 {object} payloads.NotFound
 // @Router /accounts/{accountId} [delete]
-func RemoveAccount(context *gin.Context) {
+func (account) Remove(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
 	accountChannel := make(chan entities.Account)
 	errorChannel := make(chan error)
 
-	go services.Account.GetAccount(accountId, accountChannel)
+	go services.Account.SingleById(accountId, accountChannel)
 	account := <-accountChannel
 
 	if account.Id == uuid.Nil {
@@ -108,7 +119,7 @@ func RemoveAccount(context *gin.Context) {
 		return
 	}
 
-	go services.Account.RemoveAccount(&account, errorChannel)
+	go services.Account.Remove(&account, errorChannel)
 	if err := <-errorChannel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
@@ -117,7 +128,6 @@ func RemoveAccount(context *gin.Context) {
 	context.JSON(http.StatusNoContent, payloads.NoContent{Message: "Account removed"})
 }
 
-// @BasePath /api/v1
 // @Summary update account
 // @Schemes
 // @Description update account
@@ -125,17 +135,18 @@ func RemoveAccount(context *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param accountId path string true "Account ID"
+// @Param account body inputs.Account true "account to update"
 // @Success 200 {object} entities.Account
 // @Failure 400 {object} payloads.BadRequest
 // @Failure 404 {object} payloads.NotFound
 // @Router /accounts/{accountId} [patch]
-func UpdateAccount(context *gin.Context) {
+func (account) Update(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
 	input := context.MustGet("accountInput").(inputs.Account)
 	accountChannel := make(chan entities.Account)
 	errorChannel := make(chan error)
 
-	go services.Account.GetAccount(accountId, accountChannel)
+	go services.Account.SingleById(accountId, accountChannel)
 	account := <-accountChannel
 
 	if account.Id == uuid.Nil {
@@ -145,7 +156,7 @@ func UpdateAccount(context *gin.Context) {
 
 	copier.Copy(&account, &input)
 
-	go services.Account.UpdateAccount(accountId, &account, errorChannel)
+	go services.Account.Update(accountId, &account, errorChannel)
 	if err := <-errorChannel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return

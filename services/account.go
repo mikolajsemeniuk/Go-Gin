@@ -15,26 +15,26 @@ var (
 type AccountService struct{}
 
 type IAccountService interface {
-	GetAccounts(channel chan []entities.Account)
-	GetAccount(accountId uuid.UUID, channel chan entities.Account)
-	AddAccount(account *entities.Account, channel chan error)
-	RemoveAccount(account *entities.Account, channel chan error)
-	UpdateAccount(accountId uuid.UUID, account *entities.Account, channel chan error)
+	All(channel chan []entities.Account)
+	SingleById(accountId uuid.UUID, channel chan entities.Account)
+	Add(account *entities.Account, channel chan error)
+	Remove(account *entities.Account, channel chan error)
+	Update(accountId uuid.UUID, account *entities.Account, channel chan error)
 }
 
-func (*AccountService) GetAccounts(channel chan []entities.Account) {
+func (*AccountService) All(channel chan []entities.Account) {
 	accounts := []entities.Account{}
 	data.Context.Find(&accounts)
 	channel <- accounts
 }
 
-func (*AccountService) GetAccount(accountId uuid.UUID, channel chan entities.Account) {
+func (*AccountService) SingleById(accountId uuid.UUID, channel chan entities.Account) {
 	account := entities.Account{}
 	data.Context.Take(&account, accountId)
 	channel <- account
 }
 
-func (*AccountService) AddAccount(account *entities.Account, channel chan error) {
+func (*AccountService) Add(account *entities.Account, channel chan error) {
 	result := data.Context.Create(&account)
 	if result.RowsAffected == 0 {
 		channel <- errors.New("error has occured")
@@ -42,7 +42,7 @@ func (*AccountService) AddAccount(account *entities.Account, channel chan error)
 	channel <- nil
 }
 
-func (*AccountService) RemoveAccount(account *entities.Account, channel chan error) {
+func (*AccountService) Remove(account *entities.Account, channel chan error) {
 	result := data.Context.Delete(&account)
 	if result.RowsAffected == 0 {
 		channel <- errors.New("error has occured")
@@ -50,7 +50,7 @@ func (*AccountService) RemoveAccount(account *entities.Account, channel chan err
 	channel <- nil
 }
 
-func (*AccountService) UpdateAccount(accountId uuid.UUID, account *entities.Account, channel chan error) {
+func (*AccountService) Update(accountId uuid.UUID, account *entities.Account, channel chan error) {
 	result := data.Context.Save(&account)
 	if result.RowsAffected == 0 {
 		channel <- errors.New("error has occured")

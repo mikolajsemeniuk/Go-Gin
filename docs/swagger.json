@@ -58,6 +58,17 @@
                     "accounts"
                 ],
                 "summary": "add account",
+                "parameters": [
+                    {
+                        "description": "account to create",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/inputs.Account"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -178,6 +189,15 @@
                         "name": "accountId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "account to update",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/inputs.Account"
+                        }
                     }
                 ],
                 "responses": {
@@ -242,6 +262,53 @@
                 },
                 "years_of_age": {
                     "type": "integer"
+                }
+            }
+        },
+        "inputs.Account": {
+            "type": "object",
+            "required": [
+                "email_address",
+                "full_name",
+                "is_external_contractor",
+                "note",
+                "personal_url",
+                "phone_number",
+                "relationship_status",
+                "years_of_age"
+            ],
+            "properties": {
+                "email_address": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3
+                },
+                "is_external_contractor": {
+                    "type": "boolean"
+                },
+                "note": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "minLength": 5
+                },
+                "personal_url": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "relationship_status": {
+                    "type": "integer",
+                    "maximum": 3,
+                    "minimum": 0
+                },
+                "years_of_age": {
+                    "type": "integer",
+                    "maximum": 40,
+                    "minimum": 18
                 }
             }
         },
