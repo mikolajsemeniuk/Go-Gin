@@ -6,13 +6,18 @@ import (
 	"github.com/google/uuid"
 	"github.com/mikolajsemeniuk/Supreme-Go/data"
 	"github.com/mikolajsemeniuk/Supreme-Go/entities"
+	"gorm.io/gorm"
 )
 
 var (
-	Account IAccountService = &AccountService{}
+	Account IAccountService = &accountService{
+		context: data.Context,
+	}
 )
 
-type AccountService struct{}
+type accountService struct {
+	context *gorm.DB
+}
 
 type IAccountService interface {
 	All(channel chan []entities.Account)
@@ -22,36 +27,36 @@ type IAccountService interface {
 	Update(accountId uuid.UUID, account *entities.Account, channel chan error)
 }
 
-func (*AccountService) All(channel chan []entities.Account) {
+func (a *accountService) All(channel chan []entities.Account) {
 	accounts := []entities.Account{}
-	data.Context.Find(&accounts)
+	a.context.Find(&accounts)
 	channel <- accounts
 }
 
-func (*AccountService) SingleById(accountId uuid.UUID, channel chan entities.Account) {
+func (a *accountService) SingleById(accountId uuid.UUID, channel chan entities.Account) {
 	account := entities.Account{}
-	data.Context.Take(&account, accountId)
+	a.context.Take(&account, accountId)
 	channel <- account
 }
 
-func (*AccountService) Add(account *entities.Account, channel chan error) {
-	result := data.Context.Create(&account)
+func (a *accountService) Add(account *entities.Account, channel chan error) {
+	result := a.context.Create(&account)
 	if result.RowsAffected == 0 {
 		channel <- errors.New("error has occured")
 	}
 	channel <- nil
 }
 
-func (*AccountService) Remove(account *entities.Account, channel chan error) {
-	result := data.Context.Delete(&account)
+func (a *accountService) Remove(account *entities.Account, channel chan error) {
+	result := a.context.Delete(&account)
 	if result.RowsAffected == 0 {
 		channel <- errors.New("error has occured")
 	}
 	channel <- nil
 }
 
-func (*AccountService) Update(accountId uuid.UUID, account *entities.Account, channel chan error) {
-	result := data.Context.Save(&account)
+func (a *accountService) Update(accountId uuid.UUID, account *entities.Account, channel chan error) {
+	result := a.context.Save(&account)
 	if result.RowsAffected == 0 {
 		channel <- errors.New("error has occured")
 	}
