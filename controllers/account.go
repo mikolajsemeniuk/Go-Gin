@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	Account IAccount = &account{
+	Account IAccountController = &account{
 		service: services.Account,
 	}
 )
@@ -22,7 +22,7 @@ type account struct {
 	service services.IAccountService
 }
 
-type IAccount interface {
+type IAccountController interface {
 	All(context *gin.Context)
 	Add(context *gin.Context)
 	SingleById(context *gin.Context)

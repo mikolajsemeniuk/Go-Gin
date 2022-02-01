@@ -15,6 +15,7 @@ var (
 	}
 )
 
+//go:generate mockgen -destination=../mocks/services/mockaccount.go -package=services github.com/mikolajsemeniuk/Supreme-Go/services IAccountService
 type accountService struct {
 	context *gorm.DB
 }

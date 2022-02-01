@@ -9,7 +9,7 @@ swag init
 # http://localhost:8080/swagger/index.html#/
 # http://localhost:8080/swagger/doc.json
 
-# watch
-go get github.com/codegangsta/gin
-gin run main.go
+# mocks
+go generate ./...
+go tests
 ```
