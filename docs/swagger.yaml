@@ -60,7 +60,6 @@ definitions:
     - note
     - personal_url
     - phone_number
-    - relationship_status
     - years_of_age
     type: object
   payloads.BadRequest:
@@ -222,7 +221,4 @@ paths:
       - accounts
 schemes:
 - http
-securityDefinitions:
-  BasicAuth:
-    type: basic
 swagger: "2.0"

@@ -12,13 +12,17 @@ export GOPATH=/Users/mikolajsemeniuk/go
 export PATH=$GOPATH/bin:$PATH
 source ~/.zshrc
 
+openssl genrsa -out server.key 2048
+openssl ecparam -genkey -name secp384r1 -out server.key
+openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
 
 go mod init github.com/mikolajsemeniuk/Supreme-Go
 go run main.go
 
 # generate new swagger
 swag init
-# http://localhost:8080/swagger/index.html#/
+# http://localhost:3000/swagger/index.html#/
+# https://localhost:3000/swagger/index.html#/
 # http://localhost:8080/swagger/doc.json
 
 # live reload

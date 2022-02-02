@@ -285,7 +285,6 @@ var doc = `{
                 "note",
                 "personal_url",
                 "phone_number",
-                "relationship_status",
                 "years_of_age"
             ],
             "properties": {
@@ -338,11 +337,6 @@ var doc = `{
                     "type": "string"
                 }
             }
-        }
-    },
-    "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
         }
     }
 }`

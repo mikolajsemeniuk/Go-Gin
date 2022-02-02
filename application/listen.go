@@ -31,5 +31,7 @@ func Listen() {
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	router.Run(fmt.Sprintf(":%s", configuration.Config.GetString("server.port")))
+	address := fmt.Sprintf(":%s", configuration.Config.GetString("server.port"))
+	// router.RunTLS(address, "server.crt", "server.key")
+	router.Run(address)
 }

@@ -274,7 +274,6 @@
                 "note",
                 "personal_url",
                 "phone_number",
-                "relationship_status",
                 "years_of_age"
             ],
             "properties": {
@@ -327,11 +326,6 @@
                     "type": "string"
                 }
             }
-        }
-    },
-    "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
         }
     }
 }

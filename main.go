@@ -22,8 +22,6 @@ import (
 // @host localhost:3000
 // @BasePath /api/v1
 // @schemes http
-
-// @securityDefinitions.basic  BasicAuth
 func main() {
 	data.Context.AutoMigrate(&entities.Account{})
 	logger.Info("Start the application")
