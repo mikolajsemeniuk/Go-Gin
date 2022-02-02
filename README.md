@@ -19,7 +19,6 @@ swag init
 # http://localhost:8080/swagger/index.html#/
 # http://localhost:8080/swagger/doc.json
 
-# mocks
-go generate ./...
-go tests
+go test ./...
+go test ./controllers/account 
 ```

@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/mikolajsemeniuk/Supreme-Go/controllers"
+	"github.com/mikolajsemeniuk/Supreme-Go/controllers/account"
 	docs "github.com/mikolajsemeniuk/Supreme-Go/docs"
 	"github.com/mikolajsemeniuk/Supreme-Go/middlewares"
 	swaggerfiles "github.com/swaggo/files"
@@ -23,11 +23,11 @@ func Listen() {
 	{
 		accounts := v1.Group("/accounts")
 		{
-			accounts.GET("", controllers.Account.All)
-			accounts.POST("", middlewares.AccountBody, controllers.Account.Add)
-			accounts.GET(":accountId", middlewares.AccountId, controllers.Account.SingleById)
-			accounts.DELETE(":accountId", middlewares.AccountId, controllers.Account.Remove)
-			accounts.PATCH(":accountId", middlewares.AccountId, middlewares.AccountBody, controllers.Account.Update)
+			accounts.GET("", account.Account.All)
+			accounts.POST("", middlewares.AccountBody, account.Account.Add)
+			accounts.GET(":accountId", middlewares.AccountId, account.Account.SingleById)
+			accounts.DELETE(":accountId", middlewares.AccountId, account.Account.Remove)
+			accounts.PATCH(":accountId", middlewares.AccountId, middlewares.AccountBody, account.Account.Update)
 		}
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

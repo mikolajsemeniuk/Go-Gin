@@ -1,4 +1,4 @@
-package controllers
+package account
 
 import (
 	"net/http"
@@ -13,14 +13,10 @@ import (
 )
 
 var (
-	Account IAccountController = &account{
-		service: services.Account,
-	}
+	Account IAccountController = &account{}
 )
 
-type account struct {
-	service services.IAccountService
-}
+type account struct{}
 
 type IAccountController interface {
 	All(context *gin.Context)
@@ -38,11 +34,11 @@ type IAccountController interface {
 // @Produce json
 // @Success 200 {array} entities.Account
 // @Router /accounts [get]
-func (a *account) All(context *gin.Context) {
+func (*account) All(context *gin.Context) {
 	channel := make(chan []entities.Account)
-	go a.service.All(channel)
+	go services.Account.All(channel)
 
-	context.JSON(http.StatusOK, payloads.Ok{Data: <-channel})
+	context.JSON(http.StatusOK, <-channel)
 }
 
 // @Summary add account
@@ -55,14 +51,14 @@ func (a *account) All(context *gin.Context) {
 // @Success 201 {object} entities.Account
 // @Failure 400 {object} payloads.BadRequest
 // @Router /accounts [post]
-func (a *account) Add(context *gin.Context) {
+func (*account) Add(context *gin.Context) {
 	account := entities.Account{}
 	input := context.MustGet("accountInput").(inputs.Account)
 	channel := make(chan error)
 
 	copier.Copy(&account, &input)
 
-	go a.service.Add(&account, channel)
+	go services.Account.Add(&account, channel)
 	if err := <-channel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
@@ -84,11 +80,11 @@ func (a *account) Add(context *gin.Context) {
 // @Failure 400 {object} payloads.BadRequest
 // @Failure 404 {object} payloads.NotFound
 // @Router /accounts/{accountId} [get]
-func (a *account) SingleById(context *gin.Context) {
+func (*account) SingleById(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
 	channel := make(chan entities.Account)
 
-	go a.service.SingleById(accountId, channel)
+	go services.Account.SingleById(accountId, channel)
 	account := <-channel
 
 	if account.Id == uuid.Nil {
@@ -110,12 +106,12 @@ func (a *account) SingleById(context *gin.Context) {
 // @Failure 400 {object} payloads.BadRequest
 // @Failure 404 {object} payloads.NotFound
 // @Router /accounts/{accountId} [delete]
-func (a *account) Remove(context *gin.Context) {
+func (*account) Remove(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
 	accountChannel := make(chan entities.Account)
 	errorChannel := make(chan error)
 
-	go a.service.SingleById(accountId, accountChannel)
+	go services.Account.SingleById(accountId, accountChannel)
 	account := <-accountChannel
 
 	if account.Id == uuid.Nil {
@@ -123,7 +119,7 @@ func (a *account) Remove(context *gin.Context) {
 		return
 	}
 
-	go a.service.Remove(&account, errorChannel)
+	go services.Account.Remove(&account, errorChannel)
 	if err := <-errorChannel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
@@ -144,13 +140,13 @@ func (a *account) Remove(context *gin.Context) {
 // @Failure 400 {object} payloads.BadRequest
 // @Failure 404 {object} payloads.NotFound
 // @Router /accounts/{accountId} [patch]
-func (a *account) Update(context *gin.Context) {
+func (*account) Update(context *gin.Context) {
 	accountId := context.MustGet("accountId").(uuid.UUID)
 	input := context.MustGet("accountInput").(inputs.Account)
 	accountChannel := make(chan entities.Account)
 	errorChannel := make(chan error)
 
-	go a.service.SingleById(accountId, accountChannel)
+	go services.Account.SingleById(accountId, accountChannel)
 	account := <-accountChannel
 
 	if account.Id == uuid.Nil {
@@ -160,7 +156,7 @@ func (a *account) Update(context *gin.Context) {
 
 	copier.Copy(&account, &input)
 
-	go a.service.Update(accountId, &account, errorChannel)
+	go services.Account.Update(accountId, &account, errorChannel)
 	if err := <-errorChannel; err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, payloads.BadRequest{Message: err.Error()})
 		return
