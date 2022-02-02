@@ -22,6 +22,6 @@ type Account struct {
 	PersonalUrl          string               `json:"personal_url" binding:"required" msg:"error_invalid_personal_url"`
 	YearsOfAge           int                  `json:"years_of_age" binding:"required,numeric,min=18,max=40" msg:"error_invalid_years_of_age"`
 	IsExternalContractor bool                 `json:"is_external_contractor" binding:"required" msg:"error_invalid_is_external_contractor"`
-	RelationshipStatus   e.RelationshipStatus `json:"relationship_status" binding:"required,min=0,max=3" msg:"error_invalid_relationship_status"`
+	RelationshipStatus   e.RelationshipStatus `json:"relationship_status" binding:"min=0,max=3" msg:"error_invalid_relationship_status"`
 	Note                 string               `json:"note" binding:"required,min=5,max=500" msg:"error_invalid_note"`
 }

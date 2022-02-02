@@ -1,7 +1,10 @@
 package application
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
+	"github.com/mikolajsemeniuk/Supreme-Go/configuration"
 	"github.com/mikolajsemeniuk/Supreme-Go/controllers/account"
 	docs "github.com/mikolajsemeniuk/Supreme-Go/docs"
 	"github.com/mikolajsemeniuk/Supreme-Go/middlewares"
@@ -9,17 +12,13 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-const (
-	BasePath = "/api/v1"
-)
-
 var (
 	router = gin.Default()
 )
 
 func Listen() {
-	docs.SwaggerInfo.BasePath = BasePath
-	v1 := router.Group(BasePath)
+	docs.SwaggerInfo.BasePath = configuration.Config.GetString("server.basepath")
+	v1 := router.Group(configuration.Config.GetString("server.basepath"))
 	{
 		accounts := v1.Group("/accounts")
 		{
@@ -31,5 +30,6 @@ func Listen() {
 		}
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	router.Run()
+
+	router.Run(fmt.Sprintf(":%s", configuration.Config.GetString("server.port")))
 }

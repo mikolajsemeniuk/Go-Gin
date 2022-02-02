@@ -1,0 +1,10 @@
+server:
+  port: 3000
+  basepath: /api/v1
+
+database:
+  host: localhost
+  username: root
+  password: P@ssw0rd
+  databasename: project
+  port: 35432

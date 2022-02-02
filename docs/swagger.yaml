@@ -73,7 +73,7 @@ definitions:
       message:
         type: string
     type: object
-host: localhost:8080
+host: localhost:3000
 info:
   contact:
     email: support@swagger.io
@@ -118,8 +118,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/entities.Account'
         "400":

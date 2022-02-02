@@ -5,9 +5,11 @@ brew install go
 go version
 echo $GOROOT
 which go # /usr/local/bin/go
-~/.zshrc
-export GOROOT=/usr/local/Cellar/go/1.17.6/libexec
-export PATH=$PATH:$GOROOT/bin
+# ~/.zshrc
+# export GOROOT=/usr/local/Cellar/go/1.17.6/libexec
+# export PATH=$PATH:$GOROOT/bin
+export GOPATH=/Users/mikolajsemeniuk/go
+export PATH=$GOPATH/bin:$PATH
 source ~/.zshrc
 
 
