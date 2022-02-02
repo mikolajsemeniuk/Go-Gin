@@ -14,21 +14,38 @@ import (
 	"github.com/mikolajsemeniuk/Supreme-Go/services"
 )
 
+var allMock func(channel chan []entities.Account)
+var singleById func(accountId uuid.UUID, channel chan entities.Account)
+var add func(account *entities.Account, channel chan error)
+var remove func(account *entities.Account, channel chan error)
+var update func(accountId uuid.UUID, account *entities.Account, channel chan error)
+
 type serviceMock struct{}
 
 func (serviceMock) All(channel chan []entities.Account) {
-	channel <- []entities.Account{}
+	allMock(channel)
 }
-func (serviceMock) SingleById(accountId uuid.UUID, channel chan entities.Account)             {}
-func (serviceMock) Add(account *entities.Account, channel chan error)                         {}
-func (serviceMock) Remove(account *entities.Account, channel chan error)                      {}
-func (serviceMock) Update(accountId uuid.UUID, account *entities.Account, channel chan error) {}
+func (serviceMock) SingleById(accountId uuid.UUID, channel chan entities.Account) {
+	singleById(accountId, channel)
+}
+func (serviceMock) Add(account *entities.Account, channel chan error) {
+	add(account, channel)
+}
+func (serviceMock) Remove(account *entities.Account, channel chan error) {
+	remove(account, channel)
+}
+func (serviceMock) Update(accountId uuid.UUID, account *entities.Account, channel chan error) {
+	update(accountId, account, channel)
+}
 
 func Test_should_return_accounts_with_status_code_200(t *testing.T) {
 	// Arrange
 	expected := []entities.Account{}
-	actual := []entities.Account{}
+	var actual []entities.Account
 
+	allMock = func(channel chan []entities.Account) {
+		channel <- expected
+	}
 	services.Account = serviceMock{}
 	accountController := &account{}
 
