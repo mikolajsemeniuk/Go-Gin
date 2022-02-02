@@ -21,6 +21,10 @@ swag init
 # http://localhost:8080/swagger/index.html#/
 # http://localhost:8080/swagger/doc.json
 
+# live reload
+go get -u github.com/cosmtrek/air
+air
+
 go test ./...
 go test ./controllers/account 
 ```
